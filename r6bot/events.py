@@ -15,14 +15,22 @@ def register(bot):
                     vc = member.guild.voice_client
                 else:
                     vc = await vc_channel.connect()
-                    await asyncio.sleep(1) 
+
+                # Wait until actually connected (max 3s)
+                for _ in range(30):
+                    if vc.is_connected():
+                        break
+                    await asyncio.sleep(0.1)
+
+                if not vc.is_connected():
+                    raise RuntimeError("VC connect timeout")
 
                 audio_source = discord.FFmpegPCMAudio("assets/moan.mp3")
                 if not vc.is_playing():
                     vc.play(audio_source)
 
                     while vc.is_playing():
-                         await asyncio.sleep(1) 
+                        await asyncio.sleep(1)
 
                     await vc.disconnect()
 
