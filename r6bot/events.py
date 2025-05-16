@@ -1,6 +1,7 @@
 import random
 import asyncio
 import discord
+import subprocess  
 from r6bot import config, messages
 
 def register(bot):
@@ -16,7 +17,7 @@ def register(bot):
                 else:
                     vc = await vc_channel.connect()
 
-                # Wait until actually connected (max 3s)
+                # Wait until connected
                 for _ in range(30):
                     if vc.is_connected():
                         break
@@ -31,14 +32,14 @@ def register(bot):
                     executable=ffmpeg_path,
                     before_options="-nostdin",
                     options="-vn",
-                    stderr=discord.subprocess.PIPE  # capture FFmpeg errors
+                    stderr=subprocess.PIPE  
                 ))
 
                 print("🔊 Attempting to play moan.mp3")
                 vc.play(audio_source)
                 print("🎵 Play command issued")
 
-                # Wait briefly for playback to start
+                # Wait for playback to start
                 for _ in range(10):
                     if vc.is_playing():
                         break
