@@ -27,13 +27,18 @@ def register(bot):
                     raise RuntimeError("VC connect timeout")
 
                 ffmpeg_path = "ffmpeg"
-                audio_source = discord.FFmpegPCMAudio(
-                    "assets/moan.mp3",
-                    executable=ffmpeg_path,
-                    stderr=subprocess.PIPE,
-                    before_options="-nostdin",
-                    options="-vn"
+                # Start FFmpeg process manually for deeper control
+                process = subprocess.Popen(
+                    [ffmpeg_path, "-i", "assets/moan.mp3", "-f", "s16le", "-ar", "48000", "-ac", "2", "pipe:1"],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
                 )
+
+                if not process or not process.stdout:
+                    print("❌ Failed to start ffmpeg process.")
+                    return
+
+                audio_source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(process.stdout))
 
                 print("🔊 Attempting to play moan.mp3")
                 vc.play(audio_source)
@@ -47,18 +52,15 @@ def register(bot):
 
                 if not vc.is_playing():
                     print("❌ Playback failed, disconnecting")
-
-                    # 🔻 Wait a bit to make sure ffmpeg error is written
                     await asyncio.sleep(0.2)
-                    if audio_source._process:
-                        stderr_output = audio_source._process.stderr.read()
-                        print("🔻 FFmpeg stderr:")
-                        print(stderr_output.decode())
+
+                    stderr_output, _ = process.communicate()
+                    print("🔻 FFmpeg stderr:")
+                    print(stderr_output.decode(errors="ignore"))
 
                     await vc.disconnect()
                     return
 
-                # Wait until the audio finishes
                 while vc.is_playing():
                     await asyncio.sleep(1)
 
@@ -66,7 +68,7 @@ def register(bot):
                 print("👋 Left VC after playing")
 
             except Exception as e:
-                print(f"❗️ Error joining VC: {e}")
+                print(f"❗️ Error joining VC: {repr(e)}")
 
     @bot.event
     async def on_presence_update(before, after):
