@@ -1,5 +1,8 @@
+from keep_alive import keep_alive
 from discord.ext import commands
 from r6bot import config, events
+
+keep_alive()
 
 bot = commands.Bot(command_prefix="!", intents=config.get_intents())
 
