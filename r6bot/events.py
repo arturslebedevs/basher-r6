@@ -25,14 +25,29 @@ def register(bot):
                 if not vc.is_connected():
                     raise RuntimeError("VC connect timeout")
 
-                audio_source = discord.FFmpegPCMAudio("assets/moan.mp3")
+                ffmpeg_path = "ffmpeg"
+                audio_source = discord.FFmpegPCMAudio("assets/moan.mp3", executable=ffmpeg_path)
+
+                print("Attempting to play moan.mp3")
+                vc.play(audio_source)
+                print("Play command issued")
+
+                # Wait briefly for playback to start
+                for _ in range(10):
+                    if vc.is_playing():
+                        break
+                    await asyncio.sleep(0.1)
+
                 if not vc.is_playing():
-                    vc.play(audio_source)
-
-                    while vc.is_playing():
-                        await asyncio.sleep(1)
-
+                    print("Playback failed, disconnecting")
                     await vc.disconnect()
+                    return
+
+                while vc.is_playing():
+                    await asyncio.sleep(1)
+
+                await vc.disconnect()
+                print("Left VC after playing")
 
             except Exception as e:
                 print(f"Error joining VC: {e}")
