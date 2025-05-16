@@ -1,6 +1,10 @@
 from keep_alive import keep_alive
 from discord.ext import commands
 from r6bot import config, events
+import discord  
+
+discord.opus.load_opus('libopus.so.0')
+print("Opus loaded:", discord.opus.is_loaded())  
 
 keep_alive()
 
