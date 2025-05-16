@@ -1,7 +1,6 @@
 import random
 import asyncio
 import discord
-import subprocess
 from r6bot import config, messages
 
 def register(bot):
@@ -27,18 +26,13 @@ def register(bot):
                     raise RuntimeError("VC connect timeout")
 
                 ffmpeg_path = "ffmpeg"
-                # Start FFmpeg process manually for deeper control
-                process = subprocess.Popen(
-                    [ffmpeg_path, "-i", "assets/moan.mp3", "-f", "s16le", "-ar", "48000", "-ac", "2", "pipe:1"],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE
-                )
-
-                if not process or not process.stdout:
-                    print("❌ Failed to start ffmpeg process.")
-                    return
-
-                audio_source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(process.stdout))
+                audio_source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(
+                    "assets/moan.mp3",
+                    executable=ffmpeg_path,
+                    before_options="-nostdin",
+                    options="-vn",
+                    stderr=discord.subprocess.PIPE  # capture FFmpeg errors
+                ))
 
                 print("🔊 Attempting to play moan.mp3")
                 vc.play(audio_source)
@@ -54,9 +48,10 @@ def register(bot):
                     print("❌ Playback failed, disconnecting")
                     await asyncio.sleep(0.2)
 
-                    stderr_output, _ = process.communicate()
-                    print("🔻 FFmpeg stderr:")
-                    print(stderr_output.decode(errors="ignore"))
+                    if audio_source._process:
+                        err = await asyncio.to_thread(audio_source._process.stderr.read)
+                        print("🔻 FFmpeg stderr:")
+                        print(err.decode(errors="ignore"))
 
                     await vc.disconnect()
                     return
