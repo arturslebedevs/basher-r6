@@ -1,6 +1,7 @@
 import random
 import asyncio
 import discord
+import subprocess
 from r6bot import config, messages
 
 def register(bot):
@@ -26,11 +27,17 @@ def register(bot):
                     raise RuntimeError("VC connect timeout")
 
                 ffmpeg_path = "ffmpeg"
-                audio_source = discord.FFmpegPCMAudio("assets/moan.mp3", executable=ffmpeg_path)
+                audio_source = discord.FFmpegPCMAudio(
+                    "assets/moan.mp3",
+                    executable=ffmpeg_path,
+                    stderr=subprocess.PIPE,
+                    before_options="-nostdin",
+                    options="-vn"
+                )
 
-                print("Attempting to play moan.mp3")
+                print("🔊 Attempting to play moan.mp3")
                 vc.play(audio_source)
-                print("Play command issued")
+                print("🎵 Play command issued")
 
                 # Wait briefly for playback to start
                 for _ in range(10):
@@ -39,7 +46,13 @@ def register(bot):
                     await asyncio.sleep(0.1)
 
                 if not vc.is_playing():
-                    print("Playback failed, disconnecting")
+                    # 🔻 Print stderr if playback failed
+                    if audio_source._process:
+                        stderr_output = audio_source._process.stderr.read()
+                        print("🔻 FFmpeg stderr:")
+                        print(stderr_output.decode())
+
+                    print("❌ Playback failed, disconnecting")
                     await vc.disconnect()
                     return
 
@@ -47,10 +60,10 @@ def register(bot):
                     await asyncio.sleep(1)
 
                 await vc.disconnect()
-                print("Left VC after playing")
+                print("👋 Left VC after playing")
 
             except Exception as e:
-                print(f"Error joining VC: {e}")
+                print(f"❗️ Error joining VC: {e}")
 
     @bot.event
     async def on_presence_update(before, after):
