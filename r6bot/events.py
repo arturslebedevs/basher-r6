@@ -1,4 +1,5 @@
 import random
+import asyncio
 import discord
 from r6bot import config, messages
 
@@ -14,14 +15,14 @@ def register(bot):
                     vc = member.guild.voice_client
                 else:
                     vc = await vc_channel.connect()
-                    await discord.utils.sleep(1)  # instead of wait_for_connect()
+                    await asyncio.sleep(1) 
 
                 audio_source = discord.FFmpegPCMAudio("assets/moan.mp3")
                 if not vc.is_playing():
                     vc.play(audio_source)
 
                     while vc.is_playing():
-                        await discord.utils.sleep(1)
+                         await asyncio.sleep(1) 
 
                     await vc.disconnect()
 
