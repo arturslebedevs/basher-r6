@@ -1,5 +1,5 @@
 from discord.ext import commands
-from bot import config, events
+from r6bot import config, events
 
 bot = commands.Bot(command_prefix="!", intents=config.get_intents())
 

@@ -1,6 +1,6 @@
 import random
 import discord
-from bot import config, messages
+from r6bot import config, messages
 
 def register(bot):
 

@@ -8,7 +8,7 @@ sweaty_messages = [
 redemption_messages = [
     "{user} izgāja no varavīksnes, gan jau 30min poop brake ✝️",
     "{user} izgāja no R6, bashers beidzot var atpūsties 😴",
-    "{user} beidza spēlēt R6.. cerams uz visiem laikiem 🔥"
+    "{user} beidza spēlēt R6.. cerams uz visiem laikiem 🔥",
     "{user} beidza spēlēt R6. PROUD 👏"
 ]
 
