@@ -14,14 +14,14 @@ def register(bot):
                     vc = member.guild.voice_client
                 else:
                     vc = await vc_channel.connect()
-                    await vc.wait_for_connect()
+                    await discord.utils.sleep(1)  # instead of wait_for_connect()
 
                 audio_source = discord.FFmpegPCMAudio("assets/moan.mp3")
                 if not vc.is_playing():
                     vc.play(audio_source)
 
                     while vc.is_playing():
-                        await discord.sleep(1)
+                        await discord.utils.sleep(1)
 
                     await vc.disconnect()
 
