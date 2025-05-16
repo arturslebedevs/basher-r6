@@ -46,16 +46,19 @@ def register(bot):
                     await asyncio.sleep(0.1)
 
                 if not vc.is_playing():
-                    # 🔻 Print stderr if playback failed
+                    print("❌ Playback failed, disconnecting")
+
+                    # 🔻 Wait a bit to make sure ffmpeg error is written
+                    await asyncio.sleep(0.2)
                     if audio_source._process:
                         stderr_output = audio_source._process.stderr.read()
                         print("🔻 FFmpeg stderr:")
                         print(stderr_output.decode())
 
-                    print("❌ Playback failed, disconnecting")
                     await vc.disconnect()
                     return
 
+                # Wait until the audio finishes
                 while vc.is_playing():
                     await asyncio.sleep(1)
 
