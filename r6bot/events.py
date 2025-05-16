@@ -72,3 +72,29 @@ def register(bot):
                 await message.channel.send("🖕 Atpisies")
 
         await bot.process_commands(message)
+
+    # Voice state update for ANY user
+        @bot.event
+        async def on_voice_state_update(member, before, after):
+            if before.channel is None and after.channel is not None:
+                vc_channel = after.channel
+
+                try:
+                    # If bot is already connected, skip connecting again
+                    if member.guild.voice_client:
+                        vc = member.guild.voice_client
+                    else:
+                        vc = await vc_channel.connect()
+
+                    audio_source = discord.FFmpegPCMAudio("assets/moan.mp3")
+                    if not vc.is_playing():
+                        vc.play(audio_source)
+
+                        # Wait while playing
+                        while vc.is_playing():
+                            await discord.sleep(1)
+
+                        await vc.disconnect()
+
+                except Exception as e:
+                    print(f"Error joining VC: {e}")
