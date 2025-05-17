@@ -5,9 +5,11 @@ import threading
 import time
 import requests
 
+# Load Opus library for voice support 
 discord.opus.load_opus('libopus.so.0')
 print("Opus loaded:", discord.opus.is_loaded())
 
+# Keep-alive for hosting stuff
 keep_alive()
 
 def self_ping():
@@ -21,14 +23,19 @@ def self_ping():
 
 threading.Thread(target=self_ping, daemon=True).start()
 
-bot = discord.Client(intents=config.get_intents())
+# bot and command tree setup
+intents = config.get_intents()
+bot = discord.Client(intents=intents)
 tree = discord.app_commands.CommandTree(bot)
+
+# register events and slash commands BEFORE syncing
+events.register(bot)
+bot_commands.register(tree)
 
 @bot.event
 async def on_ready():
-    await tree.sync()
+    await tree.sync()  # Sync global slash commands
     print(f"✅ Bot is online as {bot.user} and slash commands synced.")
 
-events.register(bot)
-bot_commands.register(tree)
+# Start the bot
 bot.run(config.BOT_TOKEN)
