@@ -68,8 +68,14 @@ def register(bot):
 
     @bot.event
     async def on_presence_update(before, after):
-        before_game = before.activity.name if before.activity else None
-        after_game = after.activity.name if after.activity else None
+        def get_game_name(user):
+            for activity in user.activities:
+                if isinstance(activity, discord.Game):
+                    return activity.name
+            return None
+
+        before_game = get_game_name(before)
+        after_game = get_game_name(after)
 
         for guild in bot.guilds:
             if after.id not in [m.id for m in guild.members]:
@@ -81,6 +87,7 @@ def register(bot):
 
             is_karlis = after.name == "Kārlis"
 
+            # Started playing
             if after_game and after_game != before_game:
                 print(f"🕹️ {after.name} started playing {after_game}")
 
@@ -96,8 +103,14 @@ def register(bot):
                         msg = random.choice(messages.sweaty_messages).format(user=after.mention)
                         await channel.send(msg)
 
-            if before_game == config.TARGET_GAME_R6 and (
-                after.activity is None or after.activity.name != config.TARGET_GAME_R6):
+            # Stopped playing R6
+            if before_game == config.TARGET_GAME_R6 and after_game != config.TARGET_GAME_R6:
+                await asyncio.sleep(10)  # ⏳ Buffer time
+                confirmed_game = get_game_name(after)
+                if confirmed_game == config.TARGET_GAME_R6:
+                    print(f"⚠️ False R6 exit detected for {after.name}, still playing.")
+                    return
+
                 print(f"🛑 {after.name} stopped playing R6 Siege")
 
                 if is_karlis:

@@ -14,6 +14,7 @@ keep_alive()
 def self_ping():
     while True:
         try:
+            # link u wanna ping
             requests.get("https://bfee465e-510d-4680-8a28-dca6401f1dfa-00-3fv41izmqv8r8.worf.replit.dev/")
             print("Self-pinged successfully")
         except Exception as e:
