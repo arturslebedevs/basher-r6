@@ -105,7 +105,7 @@ def register(bot):
 
             # Stopped playing R6
             if before_game == config.TARGET_GAME_R6 and after_game != config.TARGET_GAME_R6:
-                await asyncio.sleep(10)  # ⏳ Buffer time
+                await asyncio.sleep(10)  
                 confirmed_game = get_game_name(after)
                 if confirmed_game == config.TARGET_GAME_R6:
                     print(f"⚠️ False R6 exit detected for {after.name}, still playing.")

@@ -1,6 +1,6 @@
 from keep_alive import keep_alive
 from discord.ext import commands
-from r6bot import config, events
+from r6bot import config, events, commands as bot_commands 
 import discord  
 import threading
 import time
@@ -32,4 +32,5 @@ async def on_ready():
 
 
 events.register(bot)
+bot_commands.register(bot)
 bot.run(config.BOT_TOKEN)
