@@ -46,12 +46,12 @@ def register(bot):
                     await asyncio.sleep(0.1)
 
                 if not vc.is_playing():
-                    print("❌ Playback failed, disconnecting")
+                    print("Playback failed, disconnecting")
                     await asyncio.sleep(0.2)
 
                     if audio_source._process:
                         err = await asyncio.to_thread(audio_source._process.stderr.read)
-                        print("🔻 FFmpeg stderr:")
+                        print("FFmpeg stderr:")
                         print(err.decode(errors="ignore"))
 
                     await vc.disconnect()
@@ -61,10 +61,10 @@ def register(bot):
                     await asyncio.sleep(1)
 
                 await vc.disconnect()
-                print("👋 Left VC after playing")
+                print("Left VC after playing")
 
             except Exception as e:
-                print(f"❗️ Error joining VC: {repr(e)}")
+                print(f"Error joining VC: {repr(e)}")
 
     @bot.event
     async def on_presence_update(before, after):
