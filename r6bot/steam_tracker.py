@@ -3,7 +3,8 @@ import asyncio
 import os
 from dotenv import load_dotenv
 import discord
-from r6bot import config
+from r6bot import config, messages
+from r6bot.events import weighted_random_message  # Reuse from your existing logic
 
 # Load API key from .env
 load_dotenv()
@@ -12,11 +13,11 @@ STEAM_API_KEY = os.getenv("STEAM_API_KEY")
 # Steam users to track
 STEAM_USERS = {
     "Kārlis": {
-        "steamid": "76561198982317073", 
-        "discord_id": 930045752670027776  
+        "steamid": "76561198982317073",
+        "discord_id": 930045752670027776
     },
     "barbeque3": {
-        "steamid": "76561198086014989",  
+        "steamid": "76561198086014989",
         "discord_id": 520958179643883520
     },
 }
@@ -56,12 +57,42 @@ async def poll_steam_games(bot):
                     if not member:
                         continue
 
+                    is_karlis = name == "Kārlis"
+
+                    # STARTED PLAYING
                     if new_game_id and int(new_game_id) in TARGET_GAMES:
                         game_name = TARGET_GAMES[int(new_game_id)]
-                        await channel.send(f"🎮 {member.mention} started playing **{game_name}**")
-                    elif old_game_id and int(old_game_id) in TARGET_GAMES:
-                        game_name = TARGET_GAMES[int(old_game_id)]
-                        await channel.send(f"🚫 {member.mention} stopped playing **{game_name}**")
+                        print(f"[Steam] {name} started playing {game_name}")
+
+                        if int(new_game_id) == 359550:  # R6
+                            if is_karlis:
+                                msg = random.choice(messages.karlis_sweaty_messages).format(user=member.mention)
+                                await channel.send(msg)
+                            else:
+                                selected_msg = weighted_random_message(
+                                    messages.sweaty_messages,
+                                    messages.extra_russian_sweaty_messages,
+                                    base_weight=1,
+                                    extra_weight=9
+                                )
+                                msg = selected_msg.format(user=member.mention)
+                                await channel.send(msg)
+                                if selected_msg in messages.extra_russian_sweaty_messages:
+                                    file = discord.File("assets/img/russian_suffering.png")
+                                    await channel.send(file=file)
+                        elif int(new_game_id) == 730:  # CS2
+                            if is_karlis:
+                                msg = random.choice(messages.karlis_cs2_messages).format(user=member.mention)
+                                await channel.send(msg)
+
+                    # STOPPED PLAYING
+                    elif old_game_id and int(old_game_id) == 359550:  # R6 stopped
+                        print(f"[Steam] {name} stopped playing R6")
+                        if is_karlis:
+                            msg = random.choice(messages.karlis_redemption_messages).format(user=member.mention)
+                        else:
+                            msg = random.choice(messages.redemption_messages).format(user=member.mention)
+                        await channel.send(msg)
 
             current_games[steamid] = new_game_id
 

@@ -4,6 +4,11 @@ import discord
 import subprocess
 from r6bot import config, messages
 
+STEAM_USER_IDS = [
+    930045752670027776,  # Kārlis
+    520958179643883520   # barbeque3
+]
+
 def weighted_random_message(base_messages, extra_messages, base_weight=3, extra_weight=1):
     pool = base_messages * base_weight + extra_messages * extra_weight
     return random.choice(pool)
@@ -72,6 +77,9 @@ def register(bot):
 
     @bot.event
     async def on_presence_update(before, after):
+        if after.id in STEAM_USER_IDS:
+            return  # Steam handles it
+
         def get_game_name(user):
             for activity in user.activities:
                 print(f"[DEBUG] Activity for {user.name}: {activity}")
@@ -97,7 +105,7 @@ def register(bot):
 
             # Started playing
             if after_game and after_game != before_game:
-                print(f"🕹️ {after.name} started playing {after_game}")
+                print(f"🔹 {after.name} started playing {after_game}")
 
                 if is_karlis:
                     if after_game == config.TARGET_GAME_R6:
@@ -124,7 +132,7 @@ def register(bot):
 
             # Stopped playing R6
             if before_game == config.TARGET_GAME_R6 and after_game != config.TARGET_GAME_R6:
-                await asyncio.sleep(10)  
+                await asyncio.sleep(10)
                 confirmed_game = get_game_name(after)
                 if confirmed_game == config.TARGET_GAME_R6:
                     print(f"⚠️ False R6 exit detected for {after.name}, still playing.")
@@ -142,7 +150,7 @@ def register(bot):
     @bot.event
     async def on_message(message):
         if message.author.bot:
-            return  # ignore bots
+            return
 
         if bot.user in message.mentions:
             if message.author.name == "barbeque3":
