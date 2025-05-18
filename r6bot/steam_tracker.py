@@ -3,8 +3,9 @@ import asyncio
 import os
 from dotenv import load_dotenv
 import discord
+import random
 from r6bot import config, messages
-from r6bot.events import weighted_random_message  # Reuse from your existing logic
+from r6bot.events import weighted_random_message  
 
 # Load API key from .env
 load_dotenv()
@@ -12,14 +13,27 @@ STEAM_API_KEY = os.getenv("STEAM_API_KEY")
 
 # Steam users to track
 STEAM_USERS = {
-    "Kārlis": {
+    "ROBINGHOOD": {
         "steamid": "76561198982317073",
-        "discord_id": 930045752670027776
+        "discord_id": 930045752670027776,
+        "label": "Kārlis"
     },
     "barbeque3": {
         "steamid": "76561198086014989",
-        "discord_id": 520958179643883520
+        "discord_id": 520958179643883520,
+        "label": "barbeque3"
     },
+    "ChengaljenG": {
+        "steamid": "76561198342529465",
+        "discord_id": 351349100991741953,
+        "label": "kRITEX"
+    },
+    "Grim": {
+        "steamid": "76561198118135486",
+        "discord_id": 396343528927526928,
+        "label": "Harijs be like"
+    },
+
 }
 
 # Game IDs
@@ -57,7 +71,8 @@ async def poll_steam_games(bot):
                     if not member:
                         continue
 
-                    is_karlis = name == "Kārlis"
+                    label = user.get("label", name)
+                    is_karlis = label == "Kārlis"
 
                     # STARTED PLAYING
                     if new_game_id and int(new_game_id) in TARGET_GAMES:
@@ -86,7 +101,7 @@ async def poll_steam_games(bot):
                                 await channel.send(msg)
 
                     # STOPPED PLAYING
-                    elif old_game_id and int(old_game_id) == 359550:  # R6 stopped
+                    elif old_game_id and int(old_game_id) == 359550 and not new_game_id:  # R6 stopped
                         print(f"[Steam] {name} stopped playing R6")
                         if is_karlis:
                             msg = random.choice(messages.karlis_redemption_messages).format(user=member.mention)
