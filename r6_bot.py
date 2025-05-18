@@ -5,6 +5,7 @@ import threading
 import time
 import requests
 from discord.ext import commands
+from r6bot.steam_tracker import poll_steam_games
 
 # Load Opus library for voice support 
 discord.opus.load_opus('libopus.so.0')
@@ -37,6 +38,8 @@ bot_commands.register(tree)
 async def on_ready():
     await tree.sync()
     print(f"✅ Bot is online as {bot.user} and slash commands synced.")
+    
+    bot.loop.create_task(poll_steam_games(bot))
 
 # Start the bot
 bot.run(config.BOT_TOKEN)
