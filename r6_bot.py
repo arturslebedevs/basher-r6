@@ -34,7 +34,9 @@ bot_commands.register(tree)
 
 @bot.event
 async def on_ready():
-    await tree.sync()  # Sync global slash commands
+    # Clear existing global commands 
+    await tree.clear_commands(guild=None)
+    await tree.sync()
     print(f"✅ Bot is online as {bot.user} and slash commands synced.")
 
 # Start the bot

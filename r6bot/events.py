@@ -107,8 +107,10 @@ def register(bot):
                         selected_msg = weighted_random_message(
                         messages.sweaty_messages,
                         messages.extra_russian_sweaty_messages,
-                        base_weight=3,
-                        extra_weight=1
+                        # base_weight=3,
+                        # extra_weight=1
+                        base_weight=1,  # 10%
+                        extra_weight=9  # 90%
                     )
 
                         msg = selected_msg.format(user=after.mention)
