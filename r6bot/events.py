@@ -1,7 +1,7 @@
 import random
 import asyncio
 import discord
-import subprocess  
+import subprocess
 from r6bot import config, messages
 
 def weighted_random_message(base_messages, extra_messages, base_weight=3, extra_weight=1):
@@ -74,12 +74,15 @@ def register(bot):
     async def on_presence_update(before, after):
         def get_game_name(user):
             for activity in user.activities:
+                print(f"[DEBUG] Activity for {user.name}: {activity}")
                 if isinstance(activity, discord.Game):
                     return activity.name
             return None
 
         before_game = get_game_name(before)
         after_game = get_game_name(after)
+        print(f"[DEBUG] {before.name} activities: {before.activities}")
+        print(f"[DEBUG] {after.name} activities: {after.activities}")
 
         for guild in bot.guilds:
             if after.id not in [m.id for m in guild.members]:
@@ -87,6 +90,7 @@ def register(bot):
 
             channel = discord.utils.get(guild.text_channels, name=config.CHANNEL_NAME)
             if not channel:
+                print(f"[WARN] Channel '{config.CHANNEL_NAME}' not found in guild '{guild.name}'")
                 continue
 
             is_karlis = after.name == "Kārlis"
@@ -105,14 +109,11 @@ def register(bot):
                 else:
                     if after_game == config.TARGET_GAME_R6:
                         selected_msg = weighted_random_message(
-                        messages.sweaty_messages,
-                        messages.extra_russian_sweaty_messages,
-                        # base_weight=3,
-                        # extra_weight=1
-                        base_weight=1,  # 10%
-                        extra_weight=9  # 90%
-                    )
-
+                            messages.sweaty_messages,
+                            messages.extra_russian_sweaty_messages,
+                            base_weight=1,
+                            extra_weight=9
+                        )
                         msg = selected_msg.format(user=after.mention)
                         await channel.send(msg)
 
