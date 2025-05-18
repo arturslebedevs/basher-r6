@@ -12,6 +12,5 @@ def register(tree: app_commands.CommandTree):
             "**Available Commands:**\n"
             "• `/version` — Show the current bot version\n"
             "• `/help` — Show this help message\n"
-            "• Other fun stuff happens automatically when you join voice or play R6/CS2 🎮"
         )
         await interaction.response.send_message(help_text, ephemeral=True)

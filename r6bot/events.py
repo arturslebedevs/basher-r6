@@ -4,6 +4,10 @@ import discord
 import subprocess  
 from r6bot import config, messages
 
+def weighted_random_message(base_messages, extra_messages, base_weight=3, extra_weight=1):
+    pool = base_messages * base_weight + extra_messages * extra_weight
+    return random.choice(pool)
+
 def register(bot):
 
     @bot.event
@@ -28,7 +32,7 @@ def register(bot):
 
                 ffmpeg_path = "ffmpeg"
                 audio_source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(
-                    "assets/moan.mp3",
+                    "assets/audio/moan.mp3",
                     executable=ffmpeg_path,
                     before_options="-nostdin",
                     options="-vn",
@@ -100,8 +104,20 @@ def register(bot):
                         await channel.send(msg)
                 else:
                     if after_game == config.TARGET_GAME_R6:
-                        msg = random.choice(messages.sweaty_messages).format(user=after.mention)
+                        selected_msg = weighted_random_message(
+                        messages.sweaty_messages,
+                        messages.extra_russian_sweaty_messages,
+                        base_weight=3,
+                        extra_weight=1
+                    )
+
+                        msg = selected_msg.format(user=after.mention)
                         await channel.send(msg)
+
+                        # If the selected raw message came from the extra list, send image
+                        if selected_msg in messages.extra_russian_sweaty_messages:
+                            file = discord.File("assets/img/russian_suffering.png")
+                            await channel.send(file=file)
 
             # Stopped playing R6
             if before_game == config.TARGET_GAME_R6 and after_game != config.TARGET_GAME_R6:
