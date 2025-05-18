@@ -4,6 +4,7 @@ import discord
 import threading
 import time
 import requests
+from discord.ext import commands
 
 # Load Opus library for voice support 
 discord.opus.load_opus('libopus.so.0')
@@ -25,8 +26,8 @@ threading.Thread(target=self_ping, daemon=True).start()
 
 # bot and command tree setup
 intents = config.get_intents()
-bot = discord.Client(intents=intents)
-tree = discord.app_commands.CommandTree(bot)
+bot = commands.Bot(command_prefix="!", intents=intents)
+tree = bot.tree  # Access the CommandTree from the bot
 
 # register events and slash commands BEFORE syncing
 events.register(bot)
