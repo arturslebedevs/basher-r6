@@ -3,11 +3,9 @@ import asyncio
 import discord
 import subprocess
 from r6bot import config, messages
+from r6bot.steam_tracker import STEAM_USERS
+STEAM_USER_IDS = [user["discord_id"] for user in STEAM_USERS.values()]
 
-STEAM_USER_IDS = [
-    930045752670027776,  # Kārlis
-    520958179643883520   # barbeque3
-]
 
 def weighted_random_message(base_messages, extra_messages, base_weight=3, extra_weight=1):
     pool = base_messages * base_weight + extra_messages * extra_weight
@@ -119,8 +117,8 @@ def register(bot):
                         selected_msg = weighted_random_message(
                             messages.sweaty_messages,
                             messages.extra_russian_sweaty_messages,
-                            base_weight=1,
-                            extra_weight=9
+                            base_weight=3,
+                            extra_weight=1
                         )
                         msg = selected_msg.format(user=after.mention)
                         await channel.send(msg)

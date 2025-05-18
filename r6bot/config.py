@@ -12,6 +12,7 @@ CHANNEL_NAME = "💬enneeleee💬"
 
 def get_intents():
     intents = discord.Intents.default()
+    intents.message_content = True
     intents.presences = True
     intents.members = True
     intents.guilds = True
