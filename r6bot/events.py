@@ -4,12 +4,9 @@ import discord
 import subprocess
 from r6bot import config, messages
 from r6bot.steam_tracker import STEAM_USERS
+from r6bot.utils import weighted_random_message
 STEAM_USER_IDS = [user["discord_id"] for user in STEAM_USERS.values()]
 
-
-def weighted_random_message(base_messages, extra_messages, base_weight=3, extra_weight=1):
-    pool = base_messages * base_weight + extra_messages * extra_weight
-    return random.choice(pool)
 
 def register(bot):
 

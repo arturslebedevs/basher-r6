@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import discord
 import random
 from r6bot import config, messages
-from r6bot.events import weighted_random_message  
+from r6bot.utils import weighted_random_message 
 
 # Load API key from .env
 load_dotenv()
